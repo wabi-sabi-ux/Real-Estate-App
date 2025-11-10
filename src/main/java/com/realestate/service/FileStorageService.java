@@ -41,6 +41,27 @@ public class FileStorageService {
         return "/files/" + safeName;
     }
 
+    public String storeFile(MultipartFile file) throws IOException {
+        if (file == null || file.isEmpty()) throw new IOException("Empty file.");
+
+        String ext = getExtension(file.getOriginalFilename());
+        if (!ALLOWED_EXTS.contains(ext)) {
+            throw new IOException("Unsupported file extension: ." + ext + " (allowed: " + ALLOWED_EXTS + ")");
+        }
+
+        Path root = Paths.get(uploadDir).toAbsolutePath().normalize();
+        Files.createDirectories(root);
+
+        String safeName = UUID.randomUUID().toString() + "." + ext;
+        Path target = root.resolve(safeName);
+        try (InputStream is = file.getInputStream()) {
+            Files.copy(is, target, StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        // Public URL exposed by WebConfig (/files/**)
+        return "/files/" + safeName;
+    }
+
     public void deleteByPublicUrl(String publicUrl) throws IOException {
         if (publicUrl == null || !publicUrl.startsWith("/files/")) return;
         String filename = publicUrl.substring("/files/".length());

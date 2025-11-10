@@ -23,12 +23,12 @@ public final class PropertySpecifications {
 
     private static Specification<Property> configEquals(PropertyCriteria c) {
         return (root, q, cb) ->
-                c.getConfig() == null ? null : cb.equal(root.get("configuration"), c.getConfig());
+                c.getConfiguration() == null ? null : cb.equal(root.get("configuration"), c.getConfiguration());
     }
 
     private static Specification<Property> offerEquals(PropertyCriteria c) {
         return (root, q, cb) ->
-                c.getOffer() == null ? null : cb.equal(root.get("offerType"), c.getOffer());
+                c.getOfferType() == null ? null : cb.equal(root.get("offerType"), c.getOfferType());
     }
 
     private static Specification<Property> cityEquals(PropertyCriteria c) {

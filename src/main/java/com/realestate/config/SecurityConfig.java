@@ -21,17 +21,29 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("http://localhost:3000"); // React dev server
-        configuration.addAllowedMethod("*");
-        configuration.addAllowedHeader("*");
-        configuration.setAllowCredentials(true);
-        
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
+public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration configuration = new CorsConfiguration();
+
+    // Allow common local dev origins (Vite + CRA + 127.0.0.1 variants)
+    configuration.setAllowedOriginPatterns(
+        java.util.List.of(
+            "http://localhost:5173",
+            "http://127.0.0.1:5173",
+            "http://localhost:3000",
+            "http://127.0.0.1:3000"
+        )
+    );
+    configuration.setAllowCredentials(true);
+
+    // Methods/headers for typical REST + preflight + auth
+    configuration.setAllowedMethods(java.util.List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
+    configuration.setAllowedHeaders(java.util.List.of("*"));
+    configuration.setExposedHeaders(java.util.List.of("Location","Content-Disposition"));
+
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", configuration);
+    return source;
+}
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -43,7 +55,8 @@ public class SecurityConfig {
                 // public stuff
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/api/users/login").permitAll()
-                .requestMatchers("/files/**").permitAll()
+                .requestMatchers("/files/**").permitAll()  // Important for file access
+                .requestMatchers("/api/auth/**").permitAll() // registration endpoints
 
                 // allow READS for properties to everyone
                 .requestMatchers(HttpMethod.GET, "/api/properties/**").permitAll()

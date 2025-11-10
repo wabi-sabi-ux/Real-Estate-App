@@ -7,7 +7,6 @@ import com.realestate.model.Property;
 import com.realestate.repository.CustomerRepository;
 import com.realestate.repository.DealRepository;
 import com.realestate.repository.PropertyRepository;
-import com.realestate.service.EmailService;
 import com.realestate.service.IDealService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,16 +21,13 @@ public class DealServiceImpl implements IDealService {
     private final DealRepository dealRepository;
     private final PropertyRepository propertyRepository;
     private final CustomerRepository customerRepository;
-    private final EmailService emailService;
 
     public DealServiceImpl(DealRepository dealRepository,
                            PropertyRepository propertyRepository,
-                           CustomerRepository customerRepository,
-                           EmailService emailService) {
+                           CustomerRepository customerRepository) {
         this.dealRepository = dealRepository;
         this.propertyRepository = propertyRepository;
         this.customerRepository = customerRepository;
-        this.emailService = emailService;
     }
 
     @Override
@@ -61,43 +57,6 @@ public class DealServiceImpl implements IDealService {
         Deal saved = dealRepository.save(deal);
         propertyRepository.save(prop);
         customerRepository.save(cust);
-
-        // Send email notifications
-        String customerEmail = customer.getUser().getEmail();
-        String brokerEmail = property.getBroker().getUser().getEmail();
-
-        // Notify customer
-        emailService.sendDealNotification(
-            customerEmail,
-            "Deal Confirmation - " + property.getConfiguration(),
-            String.format("""
-                <h2>Deal Confirmation</h2>
-                <p>Your deal for %s at %s has been confirmed.</p>
-                <p>Deal Amount: ₹%.2f</p>
-                <p>Broker Contact: %s</p>
-                """,
-                property.getConfiguration(),
-                property.getAddress(),
-                dealCost,
-                brokerEmail
-            )
-        );
-
-        // Notify broker
-        emailService.sendDealNotification(
-            brokerEmail,
-            "New Deal Completed - " + property.getConfiguration(),
-            String.format("""
-                <h2>New Deal Completed</h2>
-                <p>A deal has been completed for your property at %s</p>
-                <p>Deal Amount: ₹%.2f</p>
-                <p>Customer Contact: %s</p>
-                """,
-                property.getAddress(),
-                dealCost,
-                customerEmail
-            )
-        );
 
         return saved;
     }

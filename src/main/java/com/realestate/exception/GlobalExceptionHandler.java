@@ -32,4 +32,28 @@ public class GlobalExceptionHandler {
                         "message", ex.getMessage()
                 ));
     }
+
+    // convert IllegalArgumentException into a proper 400 instead of 500
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<?> handleIllegalArgument(IllegalArgumentException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of(
+                        "timestamp", Instant.now().toString(),
+                        "status", 400,
+                        "error", "Bad Request",
+                        "message", ex.getMessage()
+                ));
+    }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<?> handleUnknown(Exception ex) {
+        ex.printStackTrace(); // log to console for dev
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of(
+                        "timestamp", Instant.now().toString(),
+                        "status", 500,
+                        "error", "Internal Server Error",
+                        "message", ex.getMessage(),
+                        "type", ex.getClass().getName()
+                ));
+    }
 }

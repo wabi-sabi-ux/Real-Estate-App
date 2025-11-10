@@ -77,30 +77,52 @@ public class PropertyController {
         return ResponseEntity.ok(propertyService.listAllProperties());
     }
 
+    // Get properties by broker - for broker dashboard
+    @PreAuthorize("hasRole('BROKER')")
+    @GetMapping("/broker/{brokerId}")
+    public ResponseEntity<List<Property>> getPropertiesByBroker(@PathVariable Long brokerId) {
+        // For now, we'll filter from all properties, but ideally this should be in the service
+        List<Property> allProperties = propertyService.listAllProperties();
+        List<Property> brokerProperties = allProperties.stream()
+            .filter(p -> p.getBroker() != null && p.getBroker().getBroId().equals(brokerId))
+            .collect(java.util.stream.Collectors.toList());
+        return ResponseEntity.ok(brokerProperties);
+    }
+
     // Search: /api/properties/search?city=Pune&config=FLAT&offer=SELL&minCost=10000&maxCost=90000
     @GetMapping("/search")
     public ResponseEntity<?> search(@RequestParam(required = false) String city,
                                     @RequestParam(required = false) String config,
                                     @RequestParam(required = false) String offer,
                                     @RequestParam(required = false) Double minCost,
-                                    @RequestParam(required = false) Double maxCost) {
+                                    @RequestParam(required = false) Double maxCost,
+                                    @RequestParam(required = false) Double minArea,
+                                    @RequestParam(required = false) Double maxArea,
+                                    @RequestParam(required = false) Double minRating,
+                                    @RequestParam(required = false) Boolean availableOnly) {
         PropertyCriteria c = new PropertyCriteria();
         c.setCity(city);
 
         if (config != null && !config.isBlank()) {
-            try { c.setConfig(PropertyConfig.valueOf(config.toUpperCase())); }
+            try { c.setConfiguration(PropertyConfig.valueOf(config.toUpperCase())); }
             catch (IllegalArgumentException ex) {
                 return ResponseEntity.badRequest().body("Invalid config. Use: FLAT, SHOP, PLOT");
             }
         }
         if (offer != null && !offer.isBlank()) {
-            try { c.setOffer(OfferType.valueOf(offer.toUpperCase())); }
+            try { c.setOfferType(OfferType.valueOf(offer.toUpperCase())); }
             catch (IllegalArgumentException ex) {
                 return ResponseEntity.badRequest().body("Invalid offer. Use: SELL, RENT");
             }
         }
         c.setMinCost(minCost);
         c.setMaxCost(maxCost);
+        c.setMinAreaSqft(minArea);
+        c.setMaxAreaSqft(maxArea);
+        c.setMinRating(minRating);
+        if (availableOnly != null) {
+            c.setStatus(availableOnly);
+        }
 
         return ResponseEntity.ok(propertyService.listPropertyByCriteria(c));
     }

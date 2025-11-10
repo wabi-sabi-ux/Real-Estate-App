@@ -5,8 +5,6 @@ import com.realestate.enums.PropertyConfig;
 import com.realestate.model.*;
 import com.realestate.repository.*;
 
-import java.net.PasswordAuthentication;
-
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -60,6 +58,10 @@ public class DataSeeder {
             p1.setCity("Pune");
             p1.setStatus(true);
             p1.setBroker(broker);
+            // Add sample image URLs for the flat
+            p1.getImageUrls().add("https://images.unsplash.com/photo-1560184897-ae75f418493e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80");
+            p1.getImageUrls().add("https://images.unsplash.com/photo-1484154218962-a197022b5858?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80");
+            p1.getImageUrls().add("https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80");
 
             Property p2 = new Property();
             p2.setConfiguration(PropertyConfig.SHOP);
@@ -71,6 +73,9 @@ public class DataSeeder {
             p2.setCity("Pune");
             p2.setStatus(true);
             p2.setBroker(broker);
+            // Add sample image URLs for the shop
+            p2.getImageUrls().add("https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80");
+            p2.getImageUrls().add("https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80");
 
             propertyRepo.save(p1);
             propertyRepo.save(p2);

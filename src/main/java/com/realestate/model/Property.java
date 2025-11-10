@@ -43,9 +43,9 @@ public class Property {
     @Column(name = "image_url", nullable = false)
     private List<String> imageUrls = new ArrayList<>();
 
-    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
-    private List<PropertyComment> comments = new ArrayList<>();
+    // @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
+    // @JsonIgnore
+    // private List<PropertyComment> comments = new ArrayList<>();
 
     private double avgRating;
     private int reviewCount;
@@ -86,8 +86,8 @@ public class Property {
     public Broker getBroker() { return broker; }
     public void setBroker(Broker broker) { this.broker = broker; }
 
-    public List<PropertyComment> getComments() { return comments; }
-    public void setComments(List<PropertyComment> comments) { this.comments = comments; }
+    // public List<PropertyComment> getComments() { return comments; }
+    // public void setComments(List<PropertyComment> comments) { this.comments = comments; }
 
     public double getAvgRating() { return avgRating; }
     public void setAvgRating(double avgRating) { this.avgRating = avgRating; }
